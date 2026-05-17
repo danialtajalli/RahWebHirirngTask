@@ -120,7 +120,7 @@ methods:{
 
 async doLogin(){
 await axios.get('/sanctum/csrf-cookie')
-await axios.post('/api/auth/login',this.login)
+await axios.post('/api/auth/login_admin',this.login)
 this.checkUser()
 },
 

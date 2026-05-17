@@ -52,6 +52,32 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        //Since the tables for admin and user are shared,
+        //Making sure admins cannot login as users.
+        if($user->role != UserRole::USER)
+            abort(403);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token
+        ]);
+    }
+
+    public function login_admin(LoginRequest $request): JsonResponse
+    {
+        if (!Auth::attempt($request->validated())) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        $user = Auth::user();
+        //Since the tables for admin and user are shared,
+        //Making sure users cannot login as admins.
+        if($user->role == UserRole::USER)
+            abort(403);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

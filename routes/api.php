@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 Route::prefix('auth')->group(function () {
 
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login_admin', [AuthController::class, 'login_admin'])->name('login_admin');
 
     Route::middleware('auth:sanctum')->group(function () {
 
