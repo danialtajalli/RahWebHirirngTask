@@ -223,7 +223,6 @@ password: password
 
 Possible enhancements:
 
-- Notifications for ticket updates
 - Email alerts
 - Pagination for tickets
 - Activity logs
@@ -231,7 +230,3 @@ Possible enhancements:
 - UI improvements using a component library
 
 ---
-
-# Author
-
-Implementation for programming task submission.
