@@ -107,7 +107,7 @@ class TicketApprovalTest extends TestCase
         ]);
 
         $ticket = Ticket::factory()->create([
-            'state' => TicketState::ExternalProcessing
+            'state' => TicketState::RejectedByAdmin2
         ]);
 
         Sanctum::actingAs($admin);
@@ -128,7 +128,7 @@ class TicketApprovalTest extends TestCase
     public function test_admin_2_cant_approve_ticket(): void
     {
         $admin = User::factory()->create([
-            'role' => UserRole::ADMIN_1
+            'role' => UserRole::ADMIN_2
         ]);
 
         $ticket = Ticket::factory()->create([
