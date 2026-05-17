@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/tickets/bulk-approve-admin-1', [AdminTicketController::class, 'bulkApproveAdmin1']);
         Route::post('/tickets/bulk-approve-admin-2', [AdminTicketController::class, 'bulkApproveAdmin2']);
+        Route::post('/tickets/bulk-reject-admin-1', [AdminTicketController::class, 'bulkRejectAdmin1']);
+        Route::post('/tickets/bulk-reject-admin-2', [AdminTicketController::class, 'bulkRejectAdmin2']);
     });
 
     Route::post('/fake-external-service', function ()

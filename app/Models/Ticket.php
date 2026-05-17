@@ -11,11 +11,15 @@ class Ticket extends Model
         use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title',
         'description',
-        'attachment_path',
         'state',
-        'user_id',
+        'attachment_path',
+        'admin1_comment',
+        'admin2_comment',
+        'admin1_action_at',
+        'admin2_action_at',
     ];
 
     protected $casts = [

@@ -36,27 +36,36 @@ class AdminTicketController extends Controller
         ]);
     }
 
-    public function approveAdmin1(Ticket $ticket): JsonResponse
+    public function approveAdmin1(Request $request, int $id): JsonResponse
     {
+        $request->validate([
+            'comment' => ['required', 'string'],
+        ]);
+        $ticket = Ticket::findOrFail($id);
         //Checking through policy, whether admin can approve this ticket or not
         $this->authorize('approveAdmin1', $ticket);
 
         $ticket = $this->ticketService
-            ->approveByAdmin1($ticket, auth()->user());
+            ->approveByAdmin1($ticket, auth()->user(), $request->comment);
 
         return response()->json([
             'data' => new TicketResource($ticket)
         ]);
     }
 
-    public function rejectAdmin1(Ticket $ticket)
+    public function rejectAdmin1(Request $request, int $id)
     {
+        $request->validate([
+            'comment' => ['required', 'string'],
+        ]);
+        $ticket = Ticket::findOrFail($id);
         //Checking through policy, whether admin can reject this ticket or not
         $this->authorize('rejectAdmin1', $ticket);
 
         $this->ticketService->rejectByAdmin1(
             $ticket,
-            auth()->user()
+            auth()->user(),
+            $request->comment
         );
 
         return response()->json([
@@ -64,26 +73,34 @@ class AdminTicketController extends Controller
         ]);
     }
 
-    public function approveAdmin2(Ticket $ticket): JsonResponse
+    public function approveAdmin2(Request $request, int $id): JsonResponse
     {
+        $request->validate([
+            'comment' => ['required', 'string'],
+        ]);
+         $ticket = Ticket::findOrFail($id);
         //Checking through policy, whether admin can approve this ticket or not
         $this->authorize('approveAdmin2', $ticket);
 
         $ticket = $this->ticketService
-            ->approveByAdmin2($ticket, auth()->user());
+            ->approveByAdmin2($ticket, auth()->user(), $request->comment);
 
         return response()->json([
             'data' => new TicketResource($ticket)
         ]);
     }
 
-    public function rejectAdmin2(Ticket $ticket): JsonResponse
+    public function rejectAdmin2(Request $request, int $id): JsonResponse
     {
+        $request->validate([
+            'comment' => ['required', 'string'],
+        ]);
+        $ticket = Ticket::findOrFail($id);
         //Checking through policy, whether admin can reject this ticket or not
         $this->authorize('rejectAdmin2', $ticket);
 
         $ticket = $this->ticketService
-            ->rejectByAdmin2($ticket, auth()->user());
+            ->rejectByAdmin2($ticket, auth()->user(), $request->comment);
 
         return response()->json([
             'data' => new TicketResource($ticket)
@@ -94,7 +111,8 @@ class AdminTicketController extends Controller
     {
         $request->validate([
             'ticket_ids' => ['required', 'array'],
-            'ticket_ids.*' => ['exists:tickets,id']
+            'ticket_ids.*' => ['exists:tickets,id'],
+            'comment' => ['required', 'string'],
         ]);
 
         $tickets = Ticket::whereIn('id', $request->ticket_ids)->get();
@@ -103,7 +121,7 @@ class AdminTicketController extends Controller
         {
             if (auth()->user()->can('approveAdmin1', $ticket))
             {
-                $this->ticketService->approveByAdmin1($ticket, auth()->user());
+                $this->ticketService->approveByAdmin1($ticket, auth()->user(), $request->comment);
             }
         }
 
@@ -116,7 +134,8 @@ class AdminTicketController extends Controller
     {
         $request->validate([
             'ticket_ids' => ['required', 'array'],
-            'ticket_ids.*' => ['exists:tickets,id']
+            'ticket_ids.*' => ['exists:tickets,id'],
+            'comment' => ['required', 'string'],
         ]);
 
         $tickets = Ticket::whereIn('id', $request->ticket_ids)->get();
@@ -125,7 +144,53 @@ class AdminTicketController extends Controller
         {
             if (auth()->user()->can('approveAdmin2', $ticket))
             {
-                $this->ticketService->approveByAdmin2($ticket, auth()->user());
+                $this->ticketService->approveByAdmin2($ticket, auth()->user(), $request->comment);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Tickets approved successfully'
+        ]);
+    }
+
+    public function bulkRejectAdmin2(Request $request): JsonResponse
+    {
+        $request->validate([
+            'ticket_ids' => ['required', 'array'],
+            'ticket_ids.*' => ['exists:tickets,id'],
+            'comment' => ['required', 'string'],
+        ]);
+
+        $tickets = Ticket::whereIn('id', $request->ticket_ids)->get();
+
+        foreach ($tickets as $ticket)
+        {
+            if (auth()->user()->can('rejectAdmin2', $ticket))
+            {
+                $this->ticketService->rejectByAdmin2($ticket, auth()->user(), $request->comment);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Tickets approved successfully'
+        ]);
+    }
+
+    public function bulkRejectAdmin1(Request $request): JsonResponse
+    {
+        $request->validate([
+            'ticket_ids' => ['required', 'array'],
+            'ticket_ids.*' => ['exists:tickets,id'],
+            'comment' => ['required', 'string'],
+        ]);
+
+        $tickets = Ticket::whereIn('id', $request->ticket_ids)->get();
+
+        foreach ($tickets as $ticket)
+        {
+            if (auth()->user()->can('rejectAdmin1', $ticket))
+            {
+                $this->ticketService->rejectByAdmin1($ticket, auth()->user(), $request->comment);
             }
         }
 

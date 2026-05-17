@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Enums\TicketState;
+use App\Enums\UserRole;
 use App\Events\TicketStateChanged;
 use App\Jobs\SendTicketToExternalServiceJob;
 use App\Notifications\TicketApprovedNotification;
@@ -28,32 +29,32 @@ class TicketService
         return $ticket;
     }
 
-    public function approveByAdmin1(Ticket $ticket, User $admin): Ticket
+    public function approveByAdmin1(Ticket $ticket, User $admin, string $comment): Ticket
     {
         $to = TicketState::ApprovedByAdmin1;
         $from = $ticket->state;
 
-        $this->TicketStateChange($ticket, $from, $to, $admin);
+        $this->TicketStateChange($ticket, $from, $to, $admin, $comment);
 
         return $ticket;
     }
 
-    public function rejectByAdmin1(Ticket $ticket, User $admin): Ticket
+    public function rejectByAdmin1(Ticket $ticket, User $admin, string $comment): Ticket
     {
         $to = TicketState::RejectedByAdmin1;
         $from = $ticket->state;
 
-        $this->TicketStateChange($ticket, $from, $to, $admin);
+        $this->TicketStateChange($ticket, $from, $to, $admin, $comment);
 
         return $ticket;
     }
 
-    public function approveByAdmin2(Ticket $ticket, User $admin): Ticket
+    public function approveByAdmin2(Ticket $ticket, User $admin, string $comment): Ticket
     {
         $to = TicketState::ExternalProcessing;
         $from = $ticket->state;
 
-        $this->TicketStateChange($ticket, $from, $to, $admin);
+        $this->TicketStateChange($ticket, $from, $to, $admin, $comment);
 
         //When approved by saecond admin, sending ticket to external API
         SendTicketToExternalServiceJob::dispatch($ticket->id, $admin->id);
@@ -61,11 +62,13 @@ class TicketService
         return $ticket;
     }
 
-    public function rejectByAdmin2(Ticket $ticket, User $admin): Ticket
+    public function rejectByAdmin2(Ticket $ticket, User $admin, string $comment): Ticket
     {
         $to = TicketState::RejectedByAdmin2;
         $from = $ticket->state;
         $from->assertCanTransition($to);
+
+        $this->TicketStateChange($ticket, $from, $to, $admin, $comment);
 
         $ticket->update([
             'state' => $to
@@ -86,12 +89,22 @@ class TicketService
         Ticket $ticket,
         TicketState $from,
         TicketState $to,
-        User $admin)
+        User $admin,
+        string $description)
     {
         //Deciding whether the given state can be reached from current state
         $from->assertCanTransition($to);
 
-        $ticket->update(['state' => $to]);
+        //Updating description
+        $description_value = $description;
+        $description_key = '';
+        if($admin->role == UserRole::ADMIN_1)
+            $description_key = 'admin1_comment';
+        elseif($admin->role == UserRole::ADMIN_2)
+            $description_key = 'admin2_comment';
+
+        $ticket->update(['state' => $to, $description_key => $description_value]);
+
 
         //Firing event for logging on ticket creation
         event(new TicketStateChanged(
