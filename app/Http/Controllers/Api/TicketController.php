@@ -13,8 +13,6 @@ use Illuminate\Http\JsonResponse;
 
 class TicketController extends Controller
 {
-    use ApiResponse;
-
     public function __construct(private readonly TicketService $ticketService)
     {
     }
