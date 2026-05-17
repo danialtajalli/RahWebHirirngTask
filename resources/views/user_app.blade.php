@@ -37,6 +37,7 @@ a{color:blue}
 <input v-model="register.name" placeholder="Name">
 <input v-model="register.email" placeholder="Email">
 <input type="password" v-model="register.password" placeholder="Password">
+<input type="password" v-model="register.password_confirmation" placeholder="Confirm Password">
 <button @click="registerUser">Register</button>
 <p><a href="#" @click.prevent="page='login'">Back</a></p>
 </div>
@@ -104,7 +105,7 @@ loading:false,
 tickets:[],
 file:null,
 login:{email:'',password:''},
-register:{name:'',email:'',password:''},
+register:{name:'',email:'',password:'', password_confirmation:''},
 form:{title:'',description:''}
 }
 },
