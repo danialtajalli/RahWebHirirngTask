@@ -10,65 +10,27 @@ Users can submit tickets, and the tickets go through a **two‑stage admin appro
 
 Admins can **approve or reject tickets and change their decisions if necessary**. The system keeps the ticket state visible while allowing corrections.
 
----
-
-# Features
-
-## User Features
-- User authentication (login/logout)
-- Submit new tickets
-- View submitted tickets
-- Track ticket status
-
-## Admin Features
-- View tickets assigned to their approval level
-- Approve or reject tickets
-- Change approval decisions if a mistake was made
-- Real‑time UI updates after actions
-
----
-
-# Ticket Workflow
-
-```
-User submits ticket
-        ↓
-State: submitted
-        ↓
-Admin 1 review
-   ├── approve → approved_by_admin1
-   └── reject  → rejected_by_admin1
-        ↓
-Admin 2 review
-   ├── approve → approved_by_admin2
-   └── reject  → rejected_by_admin2
-```
-
-Admins can **change their previous decision**, and the UI keeps the action buttons visible.
-
----
-
-# Tech Stack
-
-Backend:
-- Laravel
-- Laravel Sanctum (authentication)
-- MySQL
-
-Frontend:
-- Vue.js
-- Axios
-- Blade templates
+## Assumptions
+1. Admins may change their mind and rethink their decision.
+2. No over engineering and forcefully using every pattern.
+3. No over-documenting. Only documenting where code needs expalining.
+4. Front-end design in not the main point of this challenge.
 
 ---
 
 # Installation
 
+## Using docer:
+
+git clone https://github.com/danialtajalli/RahWebHirirngTask
+cd [project folder]
+RUN docker compose up --build
+
 ## 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd ticket-system
+git clone https://github.com/danialtajalli/RahWebHirirngTask
+cd [project folder]
 ```
 
 ---
@@ -100,6 +62,15 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+Add Sanctum configuration inside `.env`.
+
+Example:
+```
+SESSION_DRIVER=cookie
+SESSION_DOMAIN=127.0.0.1
+SANCTUM_STATEFUL_DOMAINS=127.0.0.1:8000
+```
+
 ---
 
 ## 4. Generate application key
@@ -129,6 +100,73 @@ Open in browser:
 ```
 http://127.0.0.1:8000
 ```
+---
+
+# Structure and Architecture:
+
+Using enums to manage tickets state and controlling the enums flow through enum functions.
+Using Laravel's built-in request functionality to manage auth and ticket submission.
+Also, using Laravel's built in policies to make sure states are managed properly.
+Using a service to manage state transtiotions, aiming for seperation of concerns using jobs 
+and events and service. Implementing the Adapter pattern for calling external API and using it in the service.
+Also, aiming for not over engineering and using too many patterns in the system.
+Using database driver for queues to keep things simple.
+Implementing notifications using Laravel's built-in notifications.
+
+# Features
+
+## User Features
+- User authentication (login/logout)
+- Submit new tickets
+- View submitted tickets
+- Track ticket status
+
+## Admin Features
+- View tickets assigned to their approval level
+- Approve or reject tickets
+- Change approval decisions if a mistake was made
+- Real‑time UI updates after actions
+
+---
+
+# Ticket Workflow
+
+```
+User submits ticket
+        ↓
+State: submitted
+        ↓
+Admin 1 review
+   ├── reject  → rejected_by_admin1
+   └── approve → approved_by_admin1
+        ↓
+Admin 2 review
+   ├── reject  → rejected_by_admin2
+   └── approve → approved_by_admin2
+        ↓
+Send to external API
+    ├── Fail  → Try again in 1h for three times
+    └── approve → Success
+```
+
+Admins can **change their previous decision**, and the UI keeps the action buttons visible.
+
+---
+
+# Tech Stack
+
+Backend:
+- Laravel
+- Laravel Sanctum (authentication)
+- MySQL
+
+Frontend:
+- Vue.js
+- Axios
+- Blade templates
+
+---
+
 
 ---
 
@@ -151,10 +189,16 @@ $request->session()->regenerateToken();
 ## User
 
 ```
+POST /register
 POST /login
+POST /login_admin
 POST /logout
 POST /api/tickets
 GET  /api/tickets
+GET  /api/tickets/{ticket}
+GET  /api/admin/tickets/admin1
+GET  /api/admin/tickets/admin2
+POST  /api/admin/tickets/fake-external-service
 ```
 
 ---
@@ -165,6 +209,8 @@ GET  /api/tickets
 GET  /api/admin/tickets/admin1
 POST /api/admin/tickets/{id}/approve-admin-1
 POST /api/admin/tickets/{id}/reject-admin-1
+POST  /api/admin/tickets/bulk-approve-admin-1
+POST  /api/admin/tickets/bulk-reject-admin-1
 ```
 
 ---
@@ -175,6 +221,9 @@ POST /api/admin/tickets/{id}/reject-admin-1
 GET  /api/admin/tickets/admin2
 POST /api/admin/tickets/{id}/approve-admin-2
 POST /api/admin/tickets/{id}/reject-admin-2
+POST  /api/admin/tickets/bulk-approve-admin-2
+POST  /api/admin/tickets/bulk-reject-admin-2
+
 ```
 
 ---
@@ -202,10 +251,6 @@ password: password
 
 Admin 2
 email: admin2@test.com
-password: password
-
-User
-email: user@test.com
 password: password
 ```
 
