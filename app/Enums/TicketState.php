@@ -4,6 +4,7 @@ namespace App\Enums;
 
 use DomainException;
 
+//Tickets states
 enum TicketState: string
 {
     case Submitted = 'submitted';
@@ -14,11 +15,13 @@ enum TicketState: string
     case ExternalFailed = 'external_failed';
     case Success = 'success';
 
+    //Controls state transmission logic
     public function canTransitionTo(self $next): bool
     {
         return in_array($next, $this->allowedTransitions(), true);
     }
 
+    //This function is called in the client code, on the current enum, to decide if it can be transitioned to the other state.
     public function assertCanTransition(self $next): void
     {
         if (!$this->canTransitionTo($next)) {
@@ -28,6 +31,7 @@ enum TicketState: string
         }
     }
 
+    //This function decides whether a state can be transitioned to another or not.
     private function allowedTransitions(): array
     {
         return match ($this) {

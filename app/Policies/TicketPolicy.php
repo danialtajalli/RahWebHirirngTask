@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use App\Models\Ticket;
 use App\Models\User;
 
+//Deciding policy for whether and admin can approve or can reject a ticket
 class TicketPolicy
 {
     public function approveAdmin1(User $user, Ticket $ticket): bool

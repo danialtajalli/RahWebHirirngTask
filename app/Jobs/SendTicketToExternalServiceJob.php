@@ -22,8 +22,10 @@ class SendTicketToExternalServiceJob implements ShouldQueue
     use InteractsWithQueue;
     use SerializesModels;
 
+    //The number of retries for each failed job.
     public int $tries = 3;
 
+    //The wait time between each retry
     public function backoff(): array
     {
         return [
@@ -50,8 +52,10 @@ class SendTicketToExternalServiceJob implements ShouldQueue
         $ticket = Ticket::findOrFail($this->ticket_id);
         $from = $ticket->state;
 
+        //Sending ticket to external API using interface and service container
         $response = $externalService->send($ticket);
 
+        //Firing event, for logging
         event(new ExternalApiCalled(ticket: $ticket, status_code: $response['status_code'], response_body: $response['body'], success: $response['success'], attempted_at: now()));
 
         $ticket->increment('external_attempts');
@@ -67,9 +71,11 @@ class SendTicketToExternalServiceJob implements ShouldQueue
             'state' => TicketState::Success
         ]);
 
+        //If successful, firing event to log state change of the ticket
         event(new TicketStateChanged(ticket: $ticket, from: $from, to: TicketState::Success, performedBy: $this->user_id));
     }
 
+    //On failure, updating ticket status to failed, and logging.
     public function failed(Throwable $exception): void
     {
         $ticket = Ticket::findOrFail($this->ticket_id);
@@ -80,9 +86,5 @@ class SendTicketToExternalServiceJob implements ShouldQueue
         ]);
 
         event(new TicketStateChanged(ticket: $ticket, from: $from, to: TicketState::ExternalFailed, performedBy: $this->user_id));
-
-        $ticket->user->notify(
-            new TicketExternalFailedNotification($ticket->id)
-        );
     }
 }

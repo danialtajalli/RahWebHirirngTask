@@ -8,6 +8,7 @@ use App\Contracts\ExternalTicketServiceInterface;
 
 class FakeExternalTicketServiceAdapter implements ExternalTicketServiceInterface
 {
+    //Sending API to current server
     public function send(Ticket $ticket): array
     {
         $response = Http::post(

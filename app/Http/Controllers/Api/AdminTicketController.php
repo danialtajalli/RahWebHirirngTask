@@ -18,6 +18,7 @@ class AdminTicketController extends Controller
 
     public function pendingAdmin1(): JsonResponse
     {
+        //Using scope to get tickets for admin 1
         $tickets = Ticket::pendingAdmin1()->get();
 
         return response()->json([
@@ -27,6 +28,7 @@ class AdminTicketController extends Controller
 
     public function pendingAdmin2(): JsonResponse
     {
+        //Using scope to get tickets for admin 2
         $tickets = Ticket::pendingAdmin2()->get();
 
         return response()->json([
@@ -36,6 +38,7 @@ class AdminTicketController extends Controller
 
     public function approveAdmin1(Ticket $ticket): JsonResponse
     {
+        //Checking through policy, whether admin can approve this ticket or not
         $this->authorize('approveAdmin1', $ticket);
 
         $ticket = $this->ticketService
@@ -48,6 +51,7 @@ class AdminTicketController extends Controller
 
     public function rejectAdmin1(Ticket $ticket)
     {
+        //Checking through policy, whether admin can reject this ticket or not
         $this->authorize('rejectAdmin1', $ticket);
 
         $this->ticketService->rejectByAdmin1(
@@ -62,6 +66,7 @@ class AdminTicketController extends Controller
 
     public function approveAdmin2(Ticket $ticket): JsonResponse
     {
+        //Checking through policy, whether admin can approve this ticket or not
         $this->authorize('approveAdmin2', $ticket);
 
         $ticket = $this->ticketService
@@ -74,6 +79,7 @@ class AdminTicketController extends Controller
 
     public function rejectAdmin2(Ticket $ticket): JsonResponse
     {
+        //Checking through policy, whether admin can reject this ticket or not
         $this->authorize('rejectAdmin2', $ticket);
 
         $ticket = $this->ticketService

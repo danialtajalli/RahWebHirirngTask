@@ -25,7 +25,7 @@ class StoreTicketRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'attachment' => [
-                'nullable',
+                'required',
                 'file',
                 'mimes:pdf,jpg,jpeg,png',
                 'max:5120'

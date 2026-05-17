@@ -37,6 +37,8 @@ class Ticket extends Model
         return $this->hasMany(ExternalApiLog::class);
     }
 
+    //The scope used to retrieve tickets for first admin.
+    //Only tickets in these scopes are shown to admin 1.
     public function scopePendingAdmin1($query)
     {
         return $query->whereIn('state', [
@@ -46,6 +48,8 @@ class Ticket extends Model
         ]);
     }
 
+    //The scope used to retrieve tickets for second admin.
+    //Only tickets in these scopes are shown to admin 2.
     public function scopePendingAdmin2($query)
     {
         return $query->whereIn('state', [
@@ -54,6 +58,8 @@ class Ticket extends Model
         ]);
     }
 
+    //Tickets that are currently being processed by external API.
+    //Hasn't been used by any UI.
     public function scopeExternalProcessing($query)
     {
         return $query->where('state', TicketState::ExternalProcessing);

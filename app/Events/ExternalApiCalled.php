@@ -13,8 +13,13 @@ class ExternalApiCalled
     /**
      * Create a new event instance.
      */
-    public function __construct(public Ticket $ticket, public int $status_code, public string $response_body, public bool $success, public string $attempted_at)
-    {
+    public function __construct(
+        public Ticket $ticket,
+        public int $status_code,
+        public string $response_body,
+        public bool $success,
+        public string $attempted_at
+    ) {
         //
     }
 }

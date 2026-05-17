@@ -8,10 +8,10 @@ use App\Enums\TicketState;
 use App\Events\TicketStateChanged;
 use App\Jobs\SendTicketToExternalServiceJob;
 use App\Notifications\TicketApprovedNotification;
-use App\Notifications\TicketRejectedNotification;
 
 class TicketService
 {
+
     public function createTicket(User $user, array $data): Ticket
     {
         $ticket = Ticket::create([
@@ -22,6 +22,7 @@ class TicketService
             'state' => TicketState::Submitted,
         ]);
 
+        //Firing event for logging on ticket creation
         event(new TicketStateChanged(ticket: $ticket, from: null, to: TicketState::Submitted, performedBy: $user->id));
 
         return $ticket;
@@ -31,18 +32,8 @@ class TicketService
     {
         $to = TicketState::ApprovedByAdmin1;
         $from = $ticket->state;
-        $from->assertCanTransition($to);
 
-        $ticket->update(['state' => $to]);
-
-        event(new TicketStateChanged(
-            ticket: $ticket,
-            from: $from,
-            to: $to,
-            performedBy: $admin->id
-        ));
-
-        $ticket->user->notify(new TicketApprovedNotification($ticket));
+        $this->TicketStateChange($ticket, $from, $to, $admin);
 
         return $ticket;
     }
@@ -51,20 +42,8 @@ class TicketService
     {
         $to = TicketState::RejectedByAdmin1;
         $from = $ticket->state;
-        $from->assertCanTransition($to);
 
-        $ticket->update([
-            'state' => $to
-        ]);
-
-        event(new TicketStateChanged(
-            ticket: $ticket,
-            from: $from,
-            to: $to,
-            performedBy: $admin->id
-        ));
-
-        $ticket->user->notify(new TicketRejectedNotification($ticket));
+        $this->TicketStateChange($ticket, $from, $to, $admin);
 
         return $ticket;
     }
@@ -73,19 +52,11 @@ class TicketService
     {
         $to = TicketState::ExternalProcessing;
         $from = $ticket->state;
-        $from->assertCanTransition($to);
-        $ticket->update(['state' => $to]);
 
-        event(new TicketStateChanged(
-            ticket: $ticket,
-            from: $from,
-            to: $to,
-            performedBy: $admin->id
-        ));
+        $this->TicketStateChange($ticket, $from, $to, $admin);
 
+        //When approved by saecond admin, sending ticket to external API
         SendTicketToExternalServiceJob::dispatch($ticket->id, $admin->id);
-
-        $ticket->user->notify(new TicketApprovedNotification($ticket));
 
         return $ticket;
     }
@@ -100,6 +71,7 @@ class TicketService
             'state' => $to
         ]);
 
+        //Firing event for logging on ticket creation
         event(new TicketStateChanged(
             ticket: $ticket,
             from: $from,
@@ -108,5 +80,28 @@ class TicketService
         ));
 
         return $ticket;
+    }
+
+    private function TicketStateChange(
+        Ticket $ticket,
+        TicketState $from,
+        TicketState $to,
+        User $admin)
+    {
+        //Deciding whether the given state can be reached from current state
+        $from->assertCanTransition($to);
+
+        $ticket->update(['state' => $to]);
+
+        //Firing event for logging on ticket creation
+        event(new TicketStateChanged(
+            ticket: $ticket,
+            from: $from,
+            to: $to,
+            performedBy: $admin->id
+        ));
+
+        //Sending notification to user
+        $ticket->user->notify(new TicketApprovedNotification($ticket));
     }
 }

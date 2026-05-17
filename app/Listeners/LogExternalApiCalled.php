@@ -12,7 +12,7 @@ class LogExternalApiCalled implements ShouldQueue
 
     /**
      * Handle the event.
-     */
+    */
     public function handle(ExternalApiCalled $event): void
     {
         ExternalApiLog::create([
