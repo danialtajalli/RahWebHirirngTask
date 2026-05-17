@@ -12,7 +12,7 @@ use Tests\TestCase;
 class TicketServiceTest extends TestCase
 {
     use RefreshDatabase;
-    
+
     public function test_admin1_can_approve_ticket()
     {
         $service = app(TicketService::class);
@@ -23,7 +23,8 @@ class TicketServiceTest extends TestCase
             'state' => TicketState::Submitted
         ]);
 
-        $service->approveByAdmin1($ticket, $admin);
+        $desctiption = fake()->sentence();
+        $service->approveByAdmin1($ticket, $admin, $desctiption);
 
         $this->assertEquals(
             TicketState::ApprovedByAdmin1,
@@ -39,8 +40,9 @@ class TicketServiceTest extends TestCase
         $ticket = Ticket::factory()->create([
             'state' => TicketState::Submitted
         ]);
+        $desctiption = fake()->sentence();
 
-        $service->rejectByAdmin1($ticket, $admin);
+        $service->rejectByAdmin1($ticket, $admin, $desctiption);
 
         $this->assertEquals(
             TicketState::RejectedByAdmin1,

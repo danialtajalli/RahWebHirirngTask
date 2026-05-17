@@ -32,8 +32,7 @@ class TicketController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->hasFile('attachment'))
-            $data['attachment_path'] = $request->file('attachment')->store('tickets', 'public');
+        $data['attachment_path'] = $request->file('attachment_path')->store('tickets', 'public');
 
         $ticket = $this->ticketService->createTicket(auth()->user(), $data);
 

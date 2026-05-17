@@ -28,7 +28,8 @@ class ExternalServiceTest extends TestCase
         Sanctum::actingAs($admin);
 
         $response = $this->postJson(
-            "/api/admin/tickets/{$ticket->id}/approve-admin-2"
+            "/api/admin/tickets/{$ticket->id}/approve-admin-2",
+            ['comment' => fake()->sentence()]
         );
 
         $response->assertOk();

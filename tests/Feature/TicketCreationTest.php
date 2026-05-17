@@ -29,7 +29,7 @@ class TicketCreationTest extends TestCase
         $response = $this->postJson('/api/tickets', [
             'title' => 'Test Ticket',
             'description' => 'Test Description',
-            'attachment' => $file,
+            'attachment_path' => $file,
         ]);
 
         $response->assertCreated();
