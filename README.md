@@ -20,11 +20,13 @@ Admins can **approve or reject tickets and change their decisions if necessary**
 
 # Installation
 
-## Using docer:
+## Using docker:
 
-git clone https://github.com/danialtajalli/RahWebHirirngTask
-cd [project folder]
-RUN docker compose up --build
+`git clone https://github.com/danialtajalli/RahWebHirirngTask`   
+`cd [project folder]`   
+Run `docker compose up --build`   
+
+## Traditional way
 
 ## 1. Clone the repository
 
@@ -235,8 +237,10 @@ POST  /api/admin/tickets/bulk-reject-admin-2
 | submitted | Ticket created by user |
 | approved_by_admin1 | Approved by Admin 1 |
 | rejected_by_admin1 | Rejected by Admin 1 |
-| approved_by_admin2 | Approved by Admin 2 |
 | rejected_by_admin2 | Rejected by Admin 2 |
+| external_processing | Approved by Admin 2 and sent to queue to contact API|
+| external_failed | Failed in contacting API part for whatever reason |
+| success | Contacted API and returned with success code |
 
 ---
 
