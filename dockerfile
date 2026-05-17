@@ -17,7 +17,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 COPY . .
-
+RUN composer config -g repos.packagist composer https://package-mirror.liara.ir/repository/composer/
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 RUN npm install && npm run build || true

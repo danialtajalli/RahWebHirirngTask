@@ -64,6 +64,50 @@ services:
         php artisan queue:work --tries=3 --timeout=90
         "
 
+  queue_logs:
+    build: .
+    restart: always
+    depends_on:
+        - mysql
+    volumes:
+        - .:/var/www
+    environment:
+        DB_CONNECTION: mysql
+        APP_KEY: base64:cg6Ky6H1OXYFbtIISfvWW5mrplfpJFTqkSOSXdw2y/g=
+        DB_HOST: mysql
+        DB_PORT: 3306
+        DB_DATABASE: laravel
+        DB_USERNAME: laravel
+        DB_PASSWORD: laravel
+        QUEUE_CONNECTION: database
+    command: >
+        sh -c "
+        sleep 20 &&
+        php artisan queue:work --queue=queue_logs --tries=3 --timeout=90
+        "
+
+  queue_api_call:
+    build: .
+    restart: always
+    depends_on:
+        - mysql
+    volumes:
+        - .:/var/www
+    environment:
+        DB_CONNECTION: mysql
+        APP_KEY: base64:cg6Ky6H1OXYFbtIISfvWW5mrplfpJFTqkSOSXdw2y/g=
+        DB_HOST: mysql
+        DB_PORT: 3306
+        DB_DATABASE: laravel
+        DB_USERNAME: laravel
+        DB_PASSWORD: laravel
+        QUEUE_CONNECTION: database
+    command: >
+        sh -c "
+        sleep 20 &&
+        php artisan queue:work --queue=api_call --tries=3 --timeout=90
+        "
+
   mysql:
     image: mysql:8.0
     container_name: laravel_mysql
