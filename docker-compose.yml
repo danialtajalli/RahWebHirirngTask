@@ -83,7 +83,7 @@ services:
     command: >
         sh -c "
         sleep 20 &&
-        php artisan queue:work --queue=queue_logs --tries=3 --timeout=90
+        php artisan queue:work --queue=logs --tries=3 --timeout=90
         "
 
   queue_api_call:
