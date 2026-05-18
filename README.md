@@ -20,6 +20,8 @@ Admins can **approve or reject tickets and change their decisions if necessary**
 
 # Installation
 
+## Routes for usage: Open routes **/app and /admin** For using the application.   
+
 ## Using docker:
 
 `git clone https://github.com/danialtajalli/RahWebHirirngTask`   
