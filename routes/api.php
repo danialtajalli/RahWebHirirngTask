@@ -42,25 +42,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/tickets/bulk-reject-admin-1', [AdminTicketController::class, 'bulkRejectAdmin1']);
         Route::post('/tickets/bulk-reject-admin-2', [AdminTicketController::class, 'bulkRejectAdmin2']);
     });
-
-    Route::post('/fake-external-service', function ()
-    {
-        $random = random_int(1, 100);
-        if ($random <= 30)
-        {
-            return response()->json([
-                'message' => 'External service failed'
-            ], 500);
-        }
-
-        return response()->json([
-            'message' => 'Ticket processed successfully'
-        ]);
-    });
 });
 Route::get('/test-error', function () {
     throw new Exception("Test error");
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::post('/fake-external-service', function ()
+{
+    $random = random_int(1, 100);
+    if ($random <= 30)
+    {
+        return response()->json([
+            'message' => 'External service failed'
+        ], 500);
+    }
+
+    return response()->json([
+        'message' => 'Ticket processed successfully'
+    ]);
 });
